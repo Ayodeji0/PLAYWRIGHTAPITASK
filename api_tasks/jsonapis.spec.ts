@@ -2,15 +2,14 @@ import { test, expect } from "@playwright/test";
 
 /* 
   THIS IS THE REFACTORED CODE THE BREAK DOWN OF THE CODE IS AFTER THIS, 2 OF THE STEPS OF THE API FAILED WHILE THE REMAINING 4 PASSED 
-  THE GET BY ID AND FAILED HENCE MADE IT IMPOSSIBLE TO EXECUTE THE PATH BUT OTHER STEPS PASSED 
- 
+  I TOOK THE PAINS TO SPLIT THE CODE AND ALSO DID SOME CONSOLE LOGS TO SHOW WHAT EACH API FUNCTIONS RETURNS.
  */
 
-const requestUrl = "https://jsonplaceholder.typicode.com/posts";
+const Url = "https://jsonplaceholder.typicode.com/posts";
 
 test("Automated API Test", async ({ request }) => {
   // Step 1: Read Total Number of Posts and Store in a Variable
-  const totalPostsResponse = await request.get(requestUrl);
+  const totalPostsResponse = await request.get(Url);
   expect(totalPostsResponse.ok()).toBeTruthy();
   expect(totalPostsResponse.status()).toBe(200);
   const totalPostsData = await totalPostsResponse.json();
@@ -23,7 +22,7 @@ test("Automated API Test", async ({ request }) => {
     title: "micheal",
     body: "let love lead",
   };
-  const createPostResponse = await request.post(requestUrl, {
+  const createPostResponse = await request.post(Url, {
     headers: {
       "Content-type": "application/json; charset=UTF-8",
     },
@@ -35,7 +34,8 @@ test("Automated API Test", async ({ request }) => {
   const createdPostId = createdPostData.id;
 
   // Step 3: Get Only the Created Post by ID
-  const getPostResponse = await request.get(`${requestUrl}/${createdPostId}`);
+  const getPostResponse = await request.get(`${Url}/${createdPostId}`);
+  //Assertions to verify
   expect(getPostResponse.ok()).toBeTruthy();
   expect(getPostResponse.status()).toBe(200);
   const retrievedPostData = await getPostResponse.json();
@@ -48,7 +48,7 @@ test("Automated API Test", async ({ request }) => {
     email: "jjjj@mail.com",
   };
   const updatePostResponse = await request.patch(
-    `${requestUrl}/${createdPostId}`,
+    `${Url}/${createdPostId}`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -61,7 +61,7 @@ test("Automated API Test", async ({ request }) => {
 
   // Confirm the successful update by retrieving the post again
   const getUpdatedPostResponse = await request.get(
-    `${requestUrl}/${createdPostId}`
+    `${Url}/${createdPostId}`
   );
   expect(getUpdatedPostResponse.ok()).toBeTruthy();
   expect(getUpdatedPostResponse.status()).toBe(200);
@@ -70,26 +70,27 @@ test("Automated API Test", async ({ request }) => {
 
   // Step 5: Delete the Created Post by ID
   const deletePostResponse = await request.delete(
-    `${requestUrl}/${createdPostId}`
+    `${Url}/${createdPostId}`
   );
   expect(deletePostResponse.ok()).toBeTruthy();
   expect(deletePostResponse.status()).toBe(200);
 
   // Verify that the post has been successfully deleted
   const getDeletedPostResponse = await request.get(
-    `${requestUrl}/${createdPostId}`
+    `${Url}/${createdPostId}`
   );
   expect(getDeletedPostResponse.ok()).toBeFalsy();
   expect(getDeletedPostResponse.status()).toBe(404);
 
-  // Step 6: Check the Number of Posts to Ensure Integrity
-  const finalTotalPostsResponse = await request.get(requestUrl);
+  // Step 6:  Assertions to Check the Number of Posts to Ensure Integrity
+  const finalTotalPostsResponse = await request.get(Url);
   expect(finalTotalPostsResponse.ok()).toBeTruthy();
   expect(finalTotalPostsResponse.status()).toBe(200);
   const finalTotalPostsData = await finalTotalPostsResponse.json();
   const finalTotalPosts = finalTotalPostsData.length;
   expect(finalTotalPosts).toBe(initialTotalPosts);
 });
+
 
 /*
 
@@ -100,215 +101,215 @@ test("Automated API Test", async ({ request }) => {
 */
 
 // REQUEST URL SET AS A GLOBAL VARIABLE
-// const requestUrl = "https://jsonplaceholder.typicode.com/posts";
+const requestUrl = "https://jsonplaceholder.typicode.com/posts";
 
-// // GET REQUEST
-// test("Read Total Number of Posts and Store in a Variable", async ({
-//   request,
-// }) => {
-//   // get request sent to /posts and response status verified
-//   const response = await request.get(requestUrl);
-//   // Assertion to ensure the response status is 200 ok
-//   expect(response.ok()).toBeTruthy();
-//   expect(response.status()).toBe(200);
-//   // Retrieve the total number of posts from the response body
-//   const responseBody = await response.json();
-//   console.log(responseBody)
-//   // Store the total number of post in a variable for future reference
-//   const total = await responseBody.length;
-// });
+// GET REQUEST
+test("Read Total Number of Posts and Store in a Variable", async ({
+  request,
+}) => {
+  // get request sent to /posts and response status verified
+  const response = await request.get(requestUrl);
+  // Assertion to ensure the response status is 200 ok
+  expect(response.ok()).toBeTruthy();
+  expect(response.status()).toBe(200);
+  // Retrieve the total number of posts from the response body
+  const responseBody = await response.json();
+  console.log(responseBody)
+  // Store the total number of post in a variable for future reference
+  const total = await responseBody.length;
+});
 
-// // POST REQUEST AND SAVE ID FOR FUTURE REFERENCE
-// test("Create a New Post and Store its ID", async ({ request }) => {
-//   const newPostData = {
-//     "userId": 1,
-//     "id": 3,
-//     "title": "micheal",
-//     "body": "let love lead"
-//   };
-//   const response = await request.post(requestUrl, {
-//     headers: {
-//       "Content-type": "application/json; charset=UTF-8",
-//     },
-//     data: JSON.stringify(newPostData),
-//   });
+// POST REQUEST AND SAVE ID FOR FUTURE REFERENCE
+test("Create a New Post and Store its ID", async ({ request }) => {
+  const newPostData = {
+    "userId": 1,
+    "id": 3,
+    "title": "micheal",
+    "body": "let love lead"
+  };
+  const response = await request.post(requestUrl, {
+    headers: {
+      "Content-type": "application/json; charset=UTF-8",
+    },
+    data: JSON.stringify(newPostData),
+  });
 
-//   // Assertion to ensure the response status is 201 ok
-//   expect(response.ok()).toBeTruthy();
-//   expect(response.status()).toBe(201);
+  // Assertion to ensure the response status is 201 ok
+  expect(response.ok()).toBeTruthy();
+  expect(response.status()).toBe(201);
 
-//   // Extract the ID of the newly created post from the response body
-//   const responseBody2 = await response.json();
-//   console.log(responseBody2)
-//   // ID STORE IN A VARIABLE FOR FUTURE REFERENCE
-//   const newPostId = responseBody2.id;
-//   console.log(newPostId);
+  // Extract the ID of the newly created post from the response body
+  const responseBody2 = await response.json();
+  console.log(responseBody2)
+  // ID STORE IN A VARIABLE FOR FUTURE REFERENCE
+  const newPostId = responseBody2.id;
+  console.log(newPostId);
 
-// });
+});
 
-// // POST BY ID AND RETRIEVAL AND VALIDATION OF DATA
-// test("Get Only the Created Post by ID", async ({ request }) => {
-//   const newPostData = {
-//     "userId": 1,
-//     "id": 3,
-//     "title": "micheal",
-//     "body": "let love lead"
-//   };
+// POST BY ID AND RETRIEVAL AND VALIDATION OF DATA
+test("Get Only the Created Post by ID", async ({ request }) => {
+  const newPostData = {
+    "userId": 1,
+    "id": 3,
+    "title": "micheal",
+    "body": "let love lead"
+  };
 
-//   // Send a POST request to create a new post
-//   const postResponse = await request.post(requestUrl, {
-//     headers: {
-//       "Content-type": "application/json; charset=UTF-8",
-//     },
-//     data: JSON.stringify(newPostData),
-//   });
+  // Send a POST request to create a new post
+  const postResponse = await request.post(requestUrl, {
+    headers: {
+      "Content-type": "application/json; charset=UTF-8",
+    },
+    data: JSON.stringify(newPostData),
+  });
 
-//   // Assertion to ensure the response status is 201 Created
-//   expect(postResponse.ok()).toBeTruthy();
-//   expect(postResponse.status()).toBe(201);
+  // Assertion to ensure the response status is 201 Created
+  expect(postResponse.ok()).toBeTruthy();
+  expect(postResponse.status()).toBe(201);
 
-//   // Extract the ID of the newly created post from the response body
-//   const responseBody3 = await postResponse.json();
-//   const newId = responseBody3.id;
-//   console.log(newId)
+  // Extract the ID of the newly created post from the response body
+  const responseBody3 = await postResponse.json();
+  const newId = responseBody3.id;
+  console.log(newId)
 
-//     // Send a GET request to retrieve the created post by its ID
-//     const getResponse = await request.get(`${requestUrl}/${newId}`)
-//   console.log(getResponse.status())
-//     // Assertion to ensure the response status is 200 OK
-//     expect(getResponse.ok()).toBeTruthy();
-//     expect(getResponse.status()).toBe(200);
+    // Send a GET request to retrieve the created post by its ID
+    const getResponse = await request.get(`${requestUrl}/${newId}`)
+  console.log(getResponse.status())
+    // Assertion to ensure the response status is 200 OK
+    expect(getResponse.ok()).toBeTruthy();
+    expect(getResponse.status()).toBe(200);
 
-//     // Retrieve the details of the created post from the response body
-//     const retrievedPost = await getResponse.json();
+    // Retrieve the details of the created post from the response body
+    const retrievedPost = await getResponse.json();
 
-// });
-// // Test to Replace Some Field in the Created Post with PATCH
-// test("Replace Some Field in the Created Post with PATCH", async ({ request }) => {
-//   const newPostData = {
-//     "userId": 1,
-//     "id": 3,
-//     "title": "micheal",
-//     "body": "let love lead"
-//   };
+});
+// Test to Replace Some Field in the Created Post with PATCH
+test("Replace Some Field in the Created Post with PATCH", async ({ request }) => {
+  const newPostData = {
+    "userId": 1,
+    "id": 3,
+    "title": "micheal",
+    "body": "let love lead"
+  };
 
-//   // Send a POST request to create a new post
-//   const postResponse = await request.post(requestUrl, {
-//     headers: {
-//       "Content-type": "application/json; charset=UTF-8",
-//     },
-//     data: JSON.stringify(newPostData),
-//   });
+  // Send a POST request to create a new post
+  const postResponse = await request.post(requestUrl, {
+    headers: {
+      "Content-type": "application/json; charset=UTF-8",
+    },
+    data: JSON.stringify(newPostData),
+  });
 
-//   // Assertion to ensure the response status is 201 Created
-//   expect(postResponse.ok()).toBeTruthy();
-//   expect(postResponse.status()).toBe(201);
+  // Assertion to ensure the response status is 201 Created
+  expect(postResponse.ok()).toBeTruthy();
+  expect(postResponse.status()).toBe(201);
 
-//   // Extract the ID of the newly created post from the response body
-//   const newPostId = (await postResponse.json()).id;
-//   console.log("Newly created post ID:", newPostId);
+  // Extract the ID of the newly created post from the response body
+  const newPostId = (await postResponse.json()).id;
+  console.log("Newly created post ID:", newPostId);
 
-//   // Prepare the updated field(s) for the post
-//   const updatedFields = {
-//     email: "jjjj@mail.com",
-//   };
+  // Prepare the updated field(s) for the post
+  const updatedFields = {
+    email: "jjjj@mail.com",
+  };
 
-//   // Send a PATCH request to update the post
-//   const patchResponse = await request.patch(`${requestUrl}/${newPostId}`, {
-//     headers: {
-//       "Content-type": "application/json; charset=UTF-8",
-//     },
-//     data: JSON.stringify(updatedFields),
-//   });
+  // Send a PATCH request to update the post
+  const patchResponse = await request.patch(`${requestUrl}/${newPostId}`, {
+    headers: {
+      "Content-type": "application/json; charset=UTF-8",
+    },
+    data: JSON.stringify(updatedFields),
+  });
 
-//   // Assertion to ensure the response status is 200 OK
-//   expect(patchResponse.ok()).toBeTruthy();
-//   expect(patchResponse.status()).toBe(200);
+  // Assertion to ensure the response status is 200 OK
+  expect(patchResponse.ok()).toBeTruthy();
+  expect(patchResponse.status()).toBe(200);
 
-//   // Send a GET request to retrieve the updated post
-//   const getResponse = await request.get(`${requestUrl}/${newPostId}`);
+  // Send a GET request to retrieve the updated post
+  const getResponse = await request.get(`${requestUrl}/${newPostId}`);
 
-//   // Assertion to ensure the response status is 200 OK
-//   expect(getResponse.ok()).toBeTruthy();
-//   expect(getResponse.status()).toBe(200);
+  // Assertion to ensure the response status is 200 OK
+  expect(getResponse.ok()).toBeTruthy();
+  expect(getResponse.status()).toBe(200);
 
-//   // Retrieve the updated post from the response body
-//   const updatedPost = await getResponse.json();
+  // Retrieve the updated post from the response body
+  const updatedPost = await getResponse.json();
 
-//   // Validate the changes in the updated post
-//   expect(updatedPost.id).toBe(newPostId);
-//   // expect(updatedPost.title).toBe(updatedFields.title);
-//   expect(updatedPost.body).toBe(newPostData.body); // Assuming body is not updated
-//   // expect(updatedPost.userId).toBe(newPostData.userId); // Assuming userId is not updated
-// });
+  // Validate the changes in the updated post
+  expect(updatedPost.id).toBe(newPostId);
+  // expect(updatedPost.title).toBe(updatedFields.title);
+  expect(updatedPost.body).toBe(newPostData.body); // Assuming body is not updated
+  // expect(updatedPost.userId).toBe(newPostData.userId); // Assuming userId is not updated
+});
 
-// // Test to Delete the Created Post by ID
-// test("Delete the Created Post by ID", async ({ request }) => {
-//   const newPostData = {
-//     "postId": 1,
-//     "id": 3,
-//     "name": "micheal",
-//     "email": "john@mail.com",
-//     "body": "let love lead"
-//   };
+// Test to Delete the Created Post by ID
+test("Delete the Created Post by ID", async ({ request }) => {
+  const newPostData = {
+    "postId": 1,
+    "id": 3,
+    "name": "micheal",
+    "email": "john@mail.com",
+    "body": "let love lead"
+  };
 
-//   // Send a POST request to create a new post
-//   const postResponse = await request.post(requestUrl, {
-//     headers: {
-//       "Content-type": "application/json; charset=UTF-8",
-//     },
-//     data: JSON.stringify(newPostData),
-//   });
+  // Send a POST request to create a new post
+  const postResponse = await request.post(requestUrl, {
+    headers: {
+      "Content-type": "application/json; charset=UTF-8",
+    },
+    data: JSON.stringify(newPostData),
+  });
 
-//   // Assertion to ensure the response status is 201 Created
-//   expect(postResponse.ok()).toBeTruthy();
-//   expect(postResponse.status()).toBe(201);
+  // Assertion to ensure the response status is 201 Created
+  expect(postResponse.ok()).toBeTruthy();
+  expect(postResponse.status()).toBe(201);
 
-//   // Extract the ID of the newly created post from the response body
-//   const newPostId = (await postResponse.json()).id;
-//   console.log("Newly created post ID:", newPostId);
+  // Extract the ID of the newly created post from the response body
+  const newPostId = (await postResponse.json()).id;
+  console.log("Newly created post ID:", newPostId);
 
-//   // Send a DELETE request to delete the created post
-//   const deleteResponse = await request.delete(`${requestUrl}/${newPostId}`);
+  // Send a DELETE request to delete the created post
+  const deleteResponse = await request.delete(`${requestUrl}/${newPostId}`);
 
-//   // Assertion to ensure the response status is 200 OK
-//   expect(deleteResponse.ok()).toBeTruthy();
-//   expect(deleteResponse.status()).toBe(200);
+  // Assertion to ensure the response status is 200 OK
+  expect(deleteResponse.ok()).toBeTruthy();
+  expect(deleteResponse.status()).toBe(200);
 
-//   // Attempt to retrieve the deleted post using a GET request
-//   const getResponse = await request.get(`${requestUrl}/${newPostId}`);
+  // Attempt to retrieve the deleted post using a GET request
+  const getResponse = await request.get(`${requestUrl}/${newPostId}`);
 
-//   // Assertion to ensure the response status is 404 Not Found
-//   expect(getResponse.ok()).toBeFalsy();
-//   expect(getResponse.status()).toBe(404);
-// });
+  // Assertion to ensure the response status is 404 Not Found
+  expect(getResponse.ok()).toBeFalsy();
+  expect(getResponse.status()).toBe(404);
+});
 
-// // Test to Check the Number of Posts to Ensure Integrity
-// test("Check the Number of Posts to Ensure Integrity", async ({ request }) => {
-//   // Step 1: Send a GET request to retrieve all posts
-//   const initialResponse = await request.get(requestUrl);
+// Test to Check the Number of Posts to Ensure Integrity
+test("Check the Number of Posts to Ensure Integrity", async ({ request }) => {
+  // Step 1: Send a GET request to retrieve all posts
+  const initialResponse = await request.get(requestUrl);
 
-//   // Assertion to ensure the response status is 200 OK
-//   expect(initialResponse.ok()).toBeTruthy();
-//   expect(initialResponse.status()).toBe(200);
+  // Assertion to ensure the response status is 200 OK
+  expect(initialResponse.ok()).toBeTruthy();
+  expect(initialResponse.status()).toBe(200);
 
-//   // Retrieve the initial total number of posts from the response body
-//   const initialPosts = await initialResponse.json();
-//   const initialTotalPosts = initialPosts.length;
-//   console.log("Initial total number of posts:", initialTotalPosts);
+  // Retrieve the initial total number of posts from the response body
+  const initialPosts = await initialResponse.json();
+  const initialTotalPosts = initialPosts.length;
+  console.log("Initial total number of posts:", initialTotalPosts);
 
-//   // Step 2: Send a GET request again to retrieve all posts
-//   const currentResponse = await request.get(requestUrl);
+  // Step 2: Send a GET request again to retrieve all posts
+  const currentResponse = await request.get(requestUrl);
 
-//   // Assertion to ensure the response status is 200 OK
-//   expect(currentResponse.ok()).toBeTruthy();
-//   expect(currentResponse.status()).toBe(200);
+  // Assertion to ensure the response status is 200 OK
+  expect(currentResponse.ok()).toBeTruthy();
+  expect(currentResponse.status()).toBe(200);
 
-//   // Retrieve the current total number of posts from the response body
-//   const currentPosts = await currentResponse.json();
-//   const currentTotalPosts = currentPosts.length;
-//   console.log("Current total number of posts:", currentTotalPosts);
+  // Retrieve the current total number of posts from the response body
+  const currentPosts = await currentResponse.json();
+  const currentTotalPosts = currentPosts.length;
+  console.log("Current total number of posts:", currentTotalPosts);
 
-//   // Step 3: Compare the initial and current total number of posts to ensure integrity
-//   expect(currentTotalPosts).toBe(initialTotalPosts);
-// });
+  // Step 3: Compare the initial and current total number of posts to ensure integrity
+  expect(currentTotalPosts).toBe(initialTotalPosts);
+});
